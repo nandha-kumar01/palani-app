@@ -59,7 +59,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab: propActi
   
   // Static tabs array - never changes
   const tabs = useMemo(() => [
-    { id: 'home' as TabId, icon: 'home-outline', label: 'Home', screen: 'home' },
+    { id: 'home' as TabId, icon: 'home-outline', label: 'Home', screen: 'Home' },
     { id: 'track' as TabId, icon: 'location-outline', label: 'Track', screen: 'LiveTracking' },
     { id: 'group' as TabId, icon: 'people-outline', label: 'Group', screen: 'GroupWalk' },
     { id: 'profile' as TabId, icon: 'person-outline', label: 'Profile', screen: 'Profile' },

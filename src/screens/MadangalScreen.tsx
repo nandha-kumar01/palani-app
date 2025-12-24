@@ -15,6 +15,8 @@ import { LinearGradient } from '../components/WebLinearGradient';
 import { WhiteCard } from '../components/GlassCard';
 import { colors, fonts, spacing } from '../utils/theme';
 import { apiHelper } from '../utils/apiHelper';
+import { apiService } from '../services/api';
+import { madangalData } from '../data/mockData';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - spacing.lg * 2;
@@ -54,9 +56,55 @@ export default function MadangalScreen({ navigation }: MadangalScreenProps) {
 
   const fetchMadangals = async () => {
     try {
-      const response = await apiHelper.get('/admin/madangal');
-      if (response.success && response.madangals) {
-        setMadangals(response.madangals);
+      // Prefer apiService which injects admin token correctly
+      const response = await apiService.getMadangal();
+      console.log('Madangal API response (apiService):', response);
+
+      let madangalArray: any[] = [];
+      if (Array.isArray(response)) {
+        madangalArray = response;
+      } else if (response.madangals && Array.isArray(response.madangals)) {
+        madangalArray = response.madangals;
+      } else if (response.madangal && Array.isArray(response.madangal)) {
+        madangalArray = response.madangal;
+      } else if (response.data && Array.isArray(response.data)) {
+        madangalArray = response.data;
+      } else if (response.madangalsList && Array.isArray(response.madangalsList)) {
+        madangalArray = response.madangalsList;
+      } else if (response.result && Array.isArray(response.result)) {
+        madangalArray = response.result;
+      }
+
+      setMadangals(madangalArray || []);
+
+      // If API returned empty, fall back to local mock data (mapped to expected shape)
+      if (!madangalArray || madangalArray.length === 0) {
+        console.warn('Madangal API returned no data — falling back to mockData');
+        const fallback = madangalData.map((m) => ({
+          _id: m.id || String(Math.random()),
+          name: m.name,
+          description: m.timings || m.address || '',
+          capacity: 100,
+          currentOccupancy: 20,
+          facilities: m.facilities || [],
+          cost: 0,
+          costType: 'free',
+          images: [],
+          location: {
+            latitude: m.location?.latitude || 0,
+            longitude: m.location?.longitude || 0,
+            address: m.address || '',
+          },
+          contact: {
+            name: '',
+            phone: m.contact || '',
+            email: '',
+          },
+          currentlyAvailable: !!m.isActive,
+          isActive: !!m.isActive,
+        }));
+
+        setMadangals(fallback);
       }
     } catch (error) {
       console.error('Error fetching madangals:', error);

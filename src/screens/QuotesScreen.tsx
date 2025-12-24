@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, A
 import { LinearGradient } from '../components/WebLinearGradient';
 import { colors, fonts, spacing } from '../utils/theme';
 import { apiHelper } from '../utils/apiHelper';
+import { apiService } from '../services/api';
+import { quotesData } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 
 interface Quote {
@@ -46,19 +48,39 @@ export default function QuotesScreen({ navigation }: QuotesScreenProps) {
   const fetchQuotes = async () => {
     try {
       setLoading(true);
-      const response = await apiHelper.get('/admin/quotes?page=1&limit=50');
-      console.log('📝 Quotes API Response:', JSON.stringify(response).substring(0, 200));
-      if (response && response.quotes) {
-        console.log('✅ Total quotes loaded:', response.quotes.length);
-        setAllQuotes(response.quotes || []);
-        setCurrentIndex(0);
-      } else if (response && response.success && response.data && response.data.quotes) {
-        console.log('✅ Total quotes loaded (from data):', response.data.quotes.length);
-        setAllQuotes(response.data.quotes || []);
-        setCurrentIndex(0);
-      } else {
-        console.log('❌ No quotes in response');
+      // Prefer apiService (adds admin token)
+      const response = await apiService.getQuotes(1, 200);
+      console.log('📝 Quotes API Response:', JSON.stringify(response).substring(0, 300));
+
+      let quotesArray: any[] = [];
+      if (Array.isArray(response)) {
+        quotesArray = response;
+      } else if (response.quotes && Array.isArray(response.quotes)) {
+        quotesArray = response.quotes;
+      } else if (response.data && Array.isArray(response.data)) {
+        quotesArray = response.data;
+      } else if (response.data && response.data.quotes && Array.isArray(response.data.quotes)) {
+        quotesArray = response.data.quotes;
+      } else if (response.result && Array.isArray(response.result)) {
+        quotesArray = response.result;
       }
+
+      if (!quotesArray || quotesArray.length === 0) {
+        console.warn('No quotes returned from API, falling back to local mockData');
+        // Map mockData to expected shape
+        quotesArray = quotesData.map((q) => ({
+          _id: q.id || String(Math.random()),
+          text: q.text,
+          author: q.author,
+          category: q.category || 'general',
+          language: q.language,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+        }));
+      }
+
+      setAllQuotes(quotesArray || []);
+      setCurrentIndex(0);
     } catch (error) {
       console.error('❌ Error fetching quotes:', error);
     } finally {

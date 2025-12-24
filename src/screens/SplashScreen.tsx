@@ -57,7 +57,14 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
     setTimeout(() => createPulseAnimation(dot1Anim, 0).start(), 0);
     setTimeout(() => createPulseAnimation(dot2Anim, 200).start(), 200);
     setTimeout(() => createPulseAnimation(dot3Anim, 400).start(), 400);
-  }, []);
+
+    // Auto-navigate to next screen after 3 seconds
+    const timer = setTimeout(() => {
+      onFinish();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onFinish]);
 
   return (
     <LinearGradient

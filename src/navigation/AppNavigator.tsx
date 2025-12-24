@@ -32,10 +32,13 @@ import QuotesScreen from '../screens/QuotesScreen';
 import GroupWalkScreen from '../screens/GroupWalkScreen';
 import GroupWalkDetailScreen from '../screens/GroupWalkDetailScreen';
 import HistoryScreen from '../screens/HistoryScreen';
+import CommunityFeedScreen from '../screens/CommunityFeedScreen';
+import FAQScreen from '../screens/FAQScreen';
 
 // Bottom Navigation
 import BottomNavigation from '../components/BottomNavigation';
 import { colors } from '../utils/theme';
+import { useApp } from '../context/AppContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -44,13 +47,55 @@ const Tab = createBottomTabNavigator();
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="Splash">
+        {({ navigation }) => (
+          <SplashScreen onFinish={() => navigation.replace('LanguageSelection')} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="LanguageSelection">
+        {({ navigation }) => (
+          <LanguageSelectionScreen onLanguageSelect={() => navigation.replace('Onboarding')} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Onboarding">
+        {({ navigation }) => (
+          <OnboardingScreen onComplete={() => navigation.replace('Login')} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Login">
+        {({ navigation }) => (
+          <LoginScreen 
+            onLogin={() => {
+              navigation.navigate('ProfileSetup');
+            }}
+            onNavigateToSignup={() => navigation.navigate('Signup')}
+            onSocialLogin={() => {}}
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="Signup">
+        {({ navigation }) => (
+          <SignupScreen 
+            onSignup={() => navigation.navigate('OTPVerification')}
+            onNavigateToLogin={() => navigation.goBack()}
+            onSocialSignup={() => {}}
+          />
+        )}
+      </Stack.Screen>
       <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
-      <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+      <Stack.Screen name="ProfileSetup">
+        {({ navigation }) => {
+          const { setAuthenticated } = useApp();
+          return (
+            <ProfileSetupScreen 
+              onComplete={(userData) => {
+                setAuthenticated(true);
+              }} 
+              initialData={undefined} 
+            />
+          );
+        }}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -109,7 +154,7 @@ function AppStack() {
 
 // Root Navigator
 export default function AppNavigator() {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const { isAuthenticated } = useApp();
 
   return (
     <NavigationContainer>

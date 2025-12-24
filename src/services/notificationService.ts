@@ -1,4 +1,6 @@
-import * as Notifications from 'expo-notifications';
+// import * as Notifications from 'expo-notifications';
+// NOTE: expo-notifications removed from Expo Go in SDK 53
+// Use a development build for push notifications: https://docs.expo.dev/develop/development-builds/introduction/
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,15 +20,16 @@ interface ScheduledNotification {
 }
 
 // Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Disabled: expo-notifications not available in Expo Go
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: true,
+//     shouldSetBadge: true,
+//     shouldShowBanner: true,
+//     shouldShowList: true,
+//   }),
+// });
 
 class NotificationService {
   private static instance: NotificationService;
@@ -41,160 +44,69 @@ class NotificationService {
 
   // Initialize notification service
   async initialize(): Promise<string | null> {
-    if (this.isInitialized) return null;
-
-    try {
-      // Request permissions
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.warn('Notification permission denied');
-        return null;
-      }
-
-      // Get push notification token
-      let token = null;
-      if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-          name: 'Default',
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
-        });
-      }
-
-      // Get expo push token for remote notifications
-      try {
-        const tokenData = await Notifications.getExpoPushTokenAsync();
-        token = tokenData.data;
-        console.log('📱 Push notification token:', token);
-      } catch (error) {
-        console.warn('Failed to get push token:', error);
-      }
-
-      this.isInitialized = true;
-      return token;
-    } catch (error) {
-      console.error('Failed to initialize notifications:', error);
-      return null;
-    }
+    // expo-notifications not available in Expo Go SDK 53+
+    // This will be implemented in development builds
+    console.log('ℹ️ Notifications disabled in Expo Go. Use development build for push notifications.');
+    this.isInitialized = true;
+    return null;
   }
 
   // Schedule a local notification
   async scheduleNotification(config: NotificationConfig): Promise<string | null> {
-    try {
-      const identifier = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: config.title,
-          body: config.body,
-          data: config.data || {},
-        },
-        trigger: config.trigger || undefined,
-      });
-      
-      console.log('📝 Scheduled notification:', identifier);
-      return identifier;
-    } catch (error) {
-      console.error('Failed to schedule notification:', error);
-      return null;
-    }
+    // Disabled in Expo Go
+    return null;
   }
 
   // Cancel a specific notification
   async cancelNotification(identifier: string): Promise<void> {
-    try {
-      await Notifications.cancelScheduledNotificationAsync(identifier);
-      console.log('❌ Cancelled notification:', identifier);
-    } catch (error) {
-      console.error('Failed to cancel notification:', error);
-    }
+    // Disabled in Expo Go
   }
 
   // Cancel all notifications
   async cancelAllNotifications(): Promise<void> {
-    try {
-      await Notifications.cancelAllScheduledNotificationsAsync();
-      console.log('❌ Cancelled all notifications');
-    } catch (error) {
-      console.error('Failed to cancel all notifications:', error);
-    }
+    // Disabled in Expo Go
   }
 
   // Get all scheduled notifications
-  async getScheduledNotifications(): Promise<Notifications.NotificationRequest[]> {
-    try {
-      return await Notifications.getAllScheduledNotificationsAsync();
-    } catch (error) {
-      console.error('Failed to get scheduled notifications:', error);
-      return [];
-    }
+  async getScheduledNotifications(): Promise<any[]> {
+    // Disabled in Expo Go
+    return [];
   }
 
   // Schedule daily walk reminder
   async scheduleDailyWalkReminder(hour: number = 6, minute: number = 0): Promise<string | null> {
-    return this.scheduleNotification({
-      title: 'Time for Your Spiritual Journey! 🚶‍♂️',
-      body: 'Start your day with a peaceful pilgrimage walk. Join the community!',
-      data: { type: 'daily_walk_reminder' },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-        hour,
-        minute,
-        repeats: true,
-      } as Notifications.CalendarTriggerInput,
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Schedule achievement notification
   async notifyAchievementUnlocked(achievementTitle: string, points: number): Promise<string | null> {
-    return this.scheduleNotification({
-      title: '🏆 Achievement Unlocked!',
-      body: `You've earned "${achievementTitle}" (+${points} points)`,
-      data: { type: 'achievement', achievement: achievementTitle, points },
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Notify about new group walk
   async notifyNewGroupWalk(walkTitle: string, startTime: Date): Promise<string | null> {
-    return this.scheduleNotification({
-      title: '👥 New Group Walk Available!',
-      body: `Join "${walkTitle}" starting soon. Don't miss out!`,
-      data: { type: 'group_walk', walkTitle, startTime: startTime.toISOString() },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: new Date(Date.now() + 1000),
-      } as Notifications.DateTriggerInput,
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Notify about annadhanam availability
   async notifyAnnadhanamAvailable(location: string, timings: string): Promise<string | null> {
-    return this.scheduleNotification({
-      title: '🍽️ Annadhanam Available',
-      body: `Free meals available at ${location}. Timings: ${timings}`,
-      data: { type: 'annadhanam', location, timings },
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Schedule festival notification
   async scheduleFestivalNotification(festivalName: string, date: Date): Promise<string | null> {
-    return this.scheduleNotification({
-      title: `🎉 ${festivalName} Approaching`,
-      body: 'Join special celebrations and community prayers at the temple.',
-      data: { type: 'festival', festivalName, date: date.toISOString() },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: new Date(date.getTime() - 24 * 60 * 60 * 1000),
-      } as Notifications.DateTriggerInput,
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Notify about meditation session
   async notifyMeditationSession(time: string): Promise<string | null> {
-    return this.scheduleNotification({
-      title: '🧘‍♂️ Meditation Time',
-      body: `Your scheduled meditation session starts at ${time}. Find your peace.`,
-      data: { type: 'meditation', time },
-    });
+    // Disabled in Expo Go
+    return null;
   }
 
   // Save notification preferences
@@ -233,13 +145,19 @@ class NotificationService {
   }
 
   // Handle notification received
-  addNotificationReceivedListener(listener: (notification: Notifications.Notification) => void) {
-    return Notifications.addNotificationReceivedListener(listener);
+  addNotificationReceivedListener(listener: (notification: any) => void) {
+    // Disabled in Expo Go - listener won't be called
+    return {
+      remove: () => {}
+    };
   }
 
   // Handle notification response (when user taps notification)
-  addNotificationResponseReceivedListener(listener: (response: Notifications.NotificationResponse) => void) {
-    return Notifications.addNotificationResponseReceivedListener(listener);
+  addNotificationResponseReceivedListener(listener: (response: any) => void) {
+    // Disabled in Expo Go - listener won't be called
+    return {
+      remove: () => {}
+    };
   }
 
   // Send push notification to specific user (requires backend)

@@ -63,7 +63,7 @@ export default function AnnadhanamScreen({ navigation }: AnnadhanamScreenProps) 
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjI0NDEwOTYsImV4cCI6MTc2MzA0NTg5Nn0.adwAcR6m1h2acDUm6HTcu1d_8frB9UxL4EG1k04BSmU'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjY0NzU3NTksImV4cCI6MTc2NzA4MDU1OX0.5WRtTCEcDR5bhMXUrIlDdPqasDXgzw0wGeUz5VLUi50'
         }
       });
 

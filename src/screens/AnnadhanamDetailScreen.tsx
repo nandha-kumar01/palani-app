@@ -13,32 +13,36 @@ import { LinearGradient } from '../components/WebLinearGradient';
 import { colors, fonts, spacing, shadows, borderRadius } from '../utils/theme';
 
 interface Annadhanam {
-  _id: string;
+  id?: string;
+  _id?: string;
   name: string;
-  description: string;
-  location: {
+  description?: string;
+  address?: string;
+  location?: {
     latitude: number;
     longitude: number;
-    address: string;
+    address?: string;
   };
-  timings: Array<{
+  timings?: string | Array<{
     day: string;
     startTime: string;
     endTime: string;
     isAvailable: boolean;
   }>;
-  foodType: string;
-  capacity: number;
-  currentAvailability: boolean;
-  images: string[];
-  isActive: boolean;
-  organizer: {
+  contact?: string;
+  foodType?: string;
+  capacity?: number;
+  currentAvailability?: boolean;
+  images?: string[];
+  isActive?: boolean;
+  organizer?: {
     name: string;
     contact: string;
   };
+  menu?: string[];
   specialInstructions?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AnnadhanamDetailScreenProps {
@@ -72,6 +76,20 @@ export default function AnnadhanamDetailScreen({ navigation, route }: Annadhanam
 
   // Check if currently open based on device time
   const getCurrentStatus = () => {
+    // Handle string timings (e.g., "6:00 AM - 10:00 PM")
+    if (typeof annadhanam.timings === 'string') {
+      return { 
+        isOpen: true, 
+        message: annadhanam.timings,
+        timing: annadhanam.timings
+      };
+    }
+
+    // Handle array timings
+    if (!Array.isArray(annadhanam.timings) || annadhanam.timings.length === 0) {
+      return { isOpen: false, message: 'Timings not available' };
+    }
+
     const now = new Date();
     const currentDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
     const currentTime = now.getHours() * 60 + now.getMinutes();
@@ -80,6 +98,10 @@ export default function AnnadhanamDetailScreen({ navigation, route }: Annadhanam
     
     if (!todayTiming || !todayTiming.isAvailable) {
       return { isOpen: false, message: 'Closed Today' };
+    }
+    
+    if (!todayTiming.startTime || !todayTiming.endTime) {
+      return { isOpen: false, message: 'Timings not available' };
     }
     
     const [startHour, startMin] = todayTiming.startTime.split(':').map(Number);
@@ -110,7 +132,9 @@ export default function AnnadhanamDetailScreen({ navigation, route }: Annadhanam
   };
 
   const status = getCurrentStatus();
-  const menuItemsCount = annadhanam.timings.filter(t => t.isAvailable).length;
+  const menuItemsCount = Array.isArray(annadhanam.timings) 
+    ? annadhanam.timings.filter(t => t.isAvailable).length 
+    : 7;
 
   return (
     <View style={styles.container}>
@@ -170,17 +194,17 @@ export default function AnnadhanamDetailScreen({ navigation, route }: Annadhanam
           <View style={styles.infoGrid}>
             <View style={styles.infoBox}>
               <Text style={styles.infoIcon}>👥</Text>
-              <Text style={styles.infoValue}>{annadhanam.capacity}</Text>
+              <Text style={styles.infoValue}>{annadhanam.capacity || '-'}</Text>
               <Text style={styles.infoLabel}>Seats</Text>
             </View>
             <View style={styles.infoBox}>
               <Text style={styles.infoIcon}>🍽️</Text>
-              <Text style={styles.infoValue}>{annadhanam.foodType}</Text>
+              <Text style={styles.infoValue}>{annadhanam.foodType || 'Vegetarian'}</Text>
               <Text style={styles.infoLabel}>Type</Text>
             </View>
             <View style={styles.infoBox}>
               <Text style={styles.infoIcon}>📅</Text>
-              <Text style={styles.infoValue}>{menuItemsCount}/7</Text>
+              <Text style={styles.infoValue}>{Array.isArray(annadhanam.timings) ? `${annadhanam.timings.length}/7` : '7/7'}</Text>
               <Text style={styles.infoLabel}>Days</Text>
             </View>
           </View>
@@ -188,39 +212,43 @@ export default function AnnadhanamDetailScreen({ navigation, route }: Annadhanam
           {/* About */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>About</Text>
-            <Text style={styles.description}>{annadhanam.description}</Text>
+            <Text style={styles.description}>{annadhanam.description || 'No description available'}</Text>
           </View>
 
           {/* Weekly Schedule */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Weekly Schedule</Text>
+            <Text style={styles.sectionTitle}>Timings</Text>
             <View style={styles.scheduleCard}>
-              {annadhanam.timings.map((timing, index) => {
-                const now = new Date();
-                const currentDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
-                const isToday = timing.day === currentDay;
-                
-                return (
-                  <View 
-                    key={index} 
-                    style={[
-                      styles.scheduleRow, 
-                      isToday && styles.todayRow,
-                      index === annadhanam.timings.length - 1 && styles.lastRow
-                    ]}
-                  >
-                    <View style={styles.dayColumn}>
-                      <Text style={[styles.dayName, isToday && styles.todayText]}>
-                        {timing.day.substring(0, 3)}
+              {Array.isArray(annadhanam.timings) ? (
+                annadhanam.timings.map((timing, index) => {
+                  const now = new Date();
+                  const currentDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
+                  const isToday = timing.day === currentDay;
+                  
+                  return (
+                    <View 
+                      key={index} 
+                      style={[
+                        styles.scheduleRow, 
+                        isToday && styles.todayRow,
+                        index === (Array.isArray(annadhanam.timings) ? annadhanam.timings.length - 1 : -1) && styles.lastRow
+                      ]}
+                    >
+                      <View style={styles.dayColumn}>
+                        <Text style={[styles.dayName, isToday && styles.todayText]}>
+                          {timing.day.substring(0, 3)}
+                        </Text>
+                        {isToday && <View style={styles.todayIndicator} />}
+                      </View>
+                      <Text style={[styles.scheduleTime, !timing.isAvailable && styles.closedSchedule]}>
+                        {timing.isAvailable ? `${timing.startTime} - ${timing.endTime}` : 'Closed'}
                       </Text>
-                      {isToday && <View style={styles.todayIndicator} />}
                     </View>
-                    <Text style={[styles.scheduleTime, !timing.isAvailable && styles.closedSchedule]}>
-                      {timing.isAvailable ? `${timing.startTime} - ${timing.endTime}` : 'Closed'}
-                    </Text>
-                  </View>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <Text style={styles.scheduleTime}>{annadhanam.timings}</Text>
+              )}
             </View>
           </View>
 

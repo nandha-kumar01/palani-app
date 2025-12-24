@@ -307,7 +307,7 @@ class ApiService {
   // Get all temples with admin token
   async getTemples(limit: number = 1000): Promise<TemplesResponse> {
     // Use admin token for temples API (since it requires admin access)
-    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjIyNjY1MDMsImV4cCI6MTc2Mjg3MTMwM30.xF4YY9_MGXuVIB8At_H7l_0703Zr_UQor5H1Rv8sU1Q';
+    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjY0NzU3NTksImV4cCI6MTc2NzA4MDU1OX0.5WRtTCEcDR5bhMXUrIlDdPqasDXgzw0wGeUz5VLUi50';
     
     return this.makeRequest<TemplesResponse>(`/admin/temples?limit=${limit}`, {
       method: 'GET',
@@ -320,9 +320,33 @@ class ApiService {
   // Get all annadhanam services with admin token
   async getAnnadhanam(): Promise<AnnadhanamResponse> {
     // Use admin token for annadhanam API (since it requires admin access)
-    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjI0NDEwOTYsImV4cCI6MTc2MzA0NTg5Nn0.adwAcR6m1h2acDUm6HTcu1d_8frB9UxL4EG1k04BSmU';
+    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjY0NzU3NTksImV4cCI6MTc2NzA4MDU1OX0.5WRtTCEcDR5bhMXUrIlDdPqasDXgzw0wGeUz5VLUi50';
     
     return this.makeRequest<AnnadhanamResponse>('/admin/annadhanam', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+  }
+
+  // Get all madangal (rest stops) with admin token
+  async getMadangal(): Promise<any> {
+    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjY0NzU3NTksImV4cCI6MTc2NzA4MDU1OX0.5WRtTCEcDR5bhMXUrIlDdPqasDXgzw0wGeUz5VLUi50';
+
+    return this.makeRequest<any>('/admin/madangal', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+  }
+
+  // Get quotes (admin)
+  async getQuotes(page: number = 1, limit: number = 200): Promise<any> {
+    const adminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkMjEwMmFiMjljOGNkYTgxNzA4OTQiLCJlbWFpbCI6ImFkbWluQHBhbGFuaS5jb20iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjY0NzU3NTksImV4cCI6MTc2NzA4MDU1OX0.5WRtTCEcDR5bhMXUrIlDdPqasDXgzw0wGeUz5VLUi50';
+
+    return this.makeRequest<any>(`/admin/quotes?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${adminToken}`,
